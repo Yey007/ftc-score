@@ -39,7 +39,8 @@ def normalize_pixels(frame):
 
 # From paper: Adaptive Local Contrast Normalization
 def normalize_standard(frame):
-    return (frame - np.mean(frame)) / np.std(frame)
+    std = (frame - np.mean(frame)) / np.std(frame)
+    return std
 
 
 # From paper: Adaptive Local Contrast Normalization

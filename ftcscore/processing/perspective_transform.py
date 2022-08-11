@@ -45,9 +45,8 @@ def get_four_point_transform(pts):
 
     M = cv2.getPerspectiveTransform(points, dst)
 
-    return M, (side_length, side_length)
+    def apply_perspective_transform(image):
+        warped = cv2.warpPerspective(image, M, (side_length, side_length))
+        return warped
 
-
-def apply_perspective_transform(image, M, shape):
-    warped = cv2.warpPerspective(image, M, shape)
-    return warped
+    return apply_perspective_transform
