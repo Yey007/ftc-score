@@ -21,27 +21,13 @@ while True:
         break
 
     cropped = crop_info_panel(frame)
-    # normalized = normalize_lcn(cropped)
     overhead = apply_perspective_transform(cropped, transform, out_shape)
-    # field, hull, rect, poly = detect_field(normalized)
-
-    # https://theailearner.com/2019/12/05/finding-convex-hull-opencv-python/
-    # cv2.drawContours(cropped, [hull], -1, color=(0, 255, 0), thickness=3)
-    # cv2.rectangle(cropped, rect, color=(0, 0, 255), thickness=3)
-    # cv2.drawContours(cropped, [poly], -1, color=(0, 255, 255), thickness=3)
 
     fps, prev_frame_time = get_fps(prev_frame_time)
     show_fps(cropped, fps)
 
     cv2.imshow("video", cropped)
-    # cv2.imshow("normalized", normalized)
     cv2.imshow("overhead", overhead)
 
     if cv2.waitKey(30) == ord('q'):
         break
-
-# image = cv2.imread('../data/raw/images/image-007-c.png')
-# cv2.imshow("ajfals", image)
-# image = normalize_pixels(image)
-# cv2.imshow('asdf', image)
-# cv2.waitKey()

@@ -1,5 +1,4 @@
 import time
-
 import cv2
 
 
@@ -11,5 +10,6 @@ def get_fps(prev_time):
 
 
 def show_fps(frame, fps):
-    cv2.putText(frame, f'FPS: {fps:.0f}', org=(50, 50), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1,
+    cv2.putText(frame, f'FPS: {fps:.0f}', org=(50, 50),
+                fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1,
                 color=(255, 0, 0), thickness=3)

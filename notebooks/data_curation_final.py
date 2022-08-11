@@ -79,6 +79,6 @@ def process_video(video):
 
 if __name__ == '__main__':
     for vid in os.listdir(IN_DIR):
-        print(f'processing {vid}')
-        if os.path.isfile(f'{IN_DIR}/{vid}') and vid == 'wisconsin.mp4':
+        if os.path.isfile(f'{IN_DIR}/{vid}'):
+            print(f'Processing {vid}')
             process_video(vid)

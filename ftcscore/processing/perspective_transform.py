@@ -2,6 +2,8 @@ import numpy as np
 from sklearn.metrics.pairwise import euclidean_distances
 import cv2
 
+# Modified from https://pyimagesearch.com/2014/08/25/4-point-opencv-getperspective-transform-example/
+
 
 def order_points(pts):
     # initialzie a list of coordinates that will be ordered
