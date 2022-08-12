@@ -40,7 +40,7 @@ def normalize_pixels(frame):
 # From paper: Adaptive Local Contrast Normalization
 def normalize_standard(frame):
     std = (frame - np.mean(frame)) / np.std(frame)
-    return std
+    return cv2.normalize(std, 0, 255, norm_type=cv2.NORM_MINMAX).astype('uint8')
 
 
 # From paper: Adaptive Local Contrast Normalization

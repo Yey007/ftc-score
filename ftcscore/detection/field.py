@@ -80,11 +80,9 @@ def detect_field_from_edges(frame):
 def detect_field_from_color(frame):
     frame = normalize_comprehensive(frame)
     mask = cv2.inRange(frame, (78, 85, 70), (95, 95, 88))
+    
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (30, 30))
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-
-    # kernel_close = cv2.getStructuringElement(cv2.MORPH_RECT, (20, 20))
-    # mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel_close)
 
     contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     contours = tuple(filter(lambda c: cv2.contourArea(c) > 2000, contours))
