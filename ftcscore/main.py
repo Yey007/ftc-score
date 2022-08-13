@@ -11,7 +11,10 @@ video_source = cv2.VideoCapture('../data/processed/videos/new/match-oregon.mp4-2
 width = int(video_source.get(cv2.CAP_PROP_FRAME_WIDTH))
 height = int(video_source.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
+frame_num = 0
 prev_frame_time = 0
+
+sub = cv2.createBackgroundSubtractorMOG2(varThreshold=32, detectShadows=False)
 
 # Wait for field detection
 while True:
@@ -43,6 +46,7 @@ while True:
     cropped = crop_info_panel(frame)
     overhead = transform(cropped)
     overhead = crop_to_rect(overhead, rect)
+    # detect_all_elements(overhead)
     detect_alliance_hub_blue(overhead)
 
     fps, prev_frame_time = get_fps(prev_frame_time)
@@ -58,6 +62,8 @@ while True:
         key = cv2.waitKey(0)
         if key == ord('q'):
             break
+
+    frame_num += 1
 
 cv2.destroyAllWindows()
 video_source.release()
