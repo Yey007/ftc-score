@@ -1,12 +1,12 @@
 import cv2
 from ftcscore.detection.field import detect_field_from_edges, detect_field_from_color
 from ftcscore.detection.game_elements import detect_all_elements
-from ftcscore.detection.game_specific.storage import detect_alliance_hub_blue
+from ftcscore.detection.game_specific.storage import detect_alliance_hub_blue, detect_alliance_hub_red
 from ftcscore.processing.crop import crop_info_panel, crop_to_rect
 from ftcscore.processing.perspective_transform import get_four_point_transform
 from ftcscore.util.fps import get_fps, show_fps
 
-video_source = cv2.VideoCapture('../data/processed/videos/new/match-oregon.mp4-252003-256743.mp4')
+video_source = cv2.VideoCapture('../data/processed/videos/new/match-wisconsin.mp4-158349-163119.mp4')
 
 width = int(video_source.get(cv2.CAP_PROP_FRAME_WIDTH))
 height = int(video_source.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -48,6 +48,7 @@ while True:
     overhead = crop_to_rect(overhead, rect)
     # detect_all_elements(overhead)
     detect_alliance_hub_blue(overhead)
+    detect_alliance_hub_red(overhead)
 
     fps, prev_frame_time = get_fps(prev_frame_time)
     show_fps(cropped, fps)
