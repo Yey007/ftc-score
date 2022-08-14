@@ -3,8 +3,10 @@ from ftcscore.detection.field import detect_field_from_edges, detect_field_from_
 from ftcscore.detection.game_elements import detect_all_elements
 from ftcscore.detection.game_specific.storage import detect_alliance_hub_blue, detect_alliance_hub_red, \
     detect_shared_hub
+from ftcscore.processing.background_selection import McKennaBackgroundSubtractor
 from ftcscore.processing.crop import crop_info_panel, crop_to_rect
 from ftcscore.processing.perspective_transform import get_four_point_transform
+from ftcscore.tracking.mckenna import TrackerMcKenna
 from ftcscore.util.fps import get_fps, show_fps
 
 video_source = cv2.VideoCapture('../data/processed/videos/new/match-oregon.mp4-252003-256743.mp4')
@@ -15,7 +17,7 @@ height = int(video_source.get(cv2.CAP_PROP_FRAME_HEIGHT))
 frame_num = 0
 prev_frame_time = 0
 
-sub = cv2.createBackgroundSubtractorMOG2(varThreshold=32, detectShadows=False)
+bg_subtractor = McKennaBackgroundSubtractor()
 
 # Wait for field detection
 while True:
@@ -47,10 +49,9 @@ while True:
     cropped = crop_info_panel(frame)
     overhead = transform(cropped)
     overhead = crop_to_rect(overhead, rect)
-    # detect_all_elements(overhead)
-    # detect_alliance_hub_blue(overhead)
-    # detect_alliance_hub_red(overhead)
-    # detect_shared_hub(overhead)
+
+    bg = bg_subtractor.apply(overhead)
+    cv2.imshow('win', bg)
 
     fps, prev_frame_time = get_fps(prev_frame_time)
     show_fps(cropped, fps)
