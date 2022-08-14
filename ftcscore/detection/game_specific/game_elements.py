@@ -25,33 +25,43 @@ class GameElement:
 BGRImage = npt.NDArray[np.uint8]
 
 
-# def detect_cubes(overhead: BGRImage) -> Iterable[GameElement]:
-#     scale = 2
-#     overhead = cv2.resize(overhead, (int(overhead.shape[1] * scale), int(overhead.shape[0] * scale)))
-#     norm = normalize_comprehensive(overhead)
-#     hsv = cv2.cvtColor(norm, cv2.COLOR_BGR2HSV)
-#     mask = cv2.inRange(hsv, (15, 30, 85), (40, 150, 110))
-#     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-#     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=1)
-#
-#     result = cv2.bitwise_and(overhead, overhead, mask=mask)
-#
-#     cv2.imshow('c', result)
-#     return []
-
 def detect_cubes(overhead: BGRImage) -> Iterable[GameElement]:
-    norm = normalize_standard(overhead)
+    norm = normalize_comprehensive(overhead)
     hsv = cv2.cvtColor(norm, cv2.COLOR_BGR2HSV)
-    cv2.imshow('bruh', hsv)
-    mask = cv2.inRange(hsv, (5, 40, 120), (40, 190, 255))
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (4, 4))
+    mask = cv2.inRange(hsv, (20, 30, 85), (40, 150, 110))
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (10, 10))
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=1)
-    kernel_open = cv2.getStructuringElement(cv2.MORPH_RECT, (4, 4))
-    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel_open, iterations=2)
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=1)
+    cv2.imshow('m', mask)
 
-    result = cv2.bitwise_and(norm, norm, mask=mask)
-    cv2.imshow('cubes', cv2.resize(result, (1000, 1000)))
+    contours, _ = cv2.findContours(mask, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_SIMPLE)
+    clusters = filter(lambda c: cv2.contourArea(c) >= 450, contours)
+    individuals = filter(lambda c: 450 > cv2.contourArea(c) > 130, contours)
+
+    for cluster in clusters:
+        rect = cv2.boundingRect(cluster)
+        cv2.rectangle(overhead, rect, color=(0, 255, 0))
+
+    for individual in individuals:
+        rect = cv2.boundingRect(individual)
+        cv2.rectangle(overhead, rect, color=(255, 0, 0))
+
     return []
+
+# def detect_cubes(overhead: BGRImage) -> Iterable[GameElement]:
+#     norm = normalize_standard(overhead)
+#     hsv = cv2.cvtColor(norm, cv2.COLOR_BGR2HSV)
+#     cv2.imshow('bruh', hsv)
+#     mask = cv2.inRange(hsv, (0, 40, 120), (30, 190, 255))
+#     # kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (4, 4))
+#     # mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=1)
+#     # kernel_open = cv2.getStructuringElement(cv2.MORPH_RECT, (4, 4))
+#     # mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel_open, iterations=2)
+#
+#     result = cv2.bitwise_and(norm, norm, mask=mask)
+#     cv2.imshow('cubes', cv2.resize(result, (1000, 1000)))
+#     return []
 
 
 detectors = [detect_cubes]
