@@ -1,10 +1,13 @@
 import cv2
+import numpy as np
+
 from ftcscore.detection.field import detect_field_from_edges, detect_field_from_color
 from ftcscore.detection.game_elements import detect_all_elements
 from ftcscore.detection.game_specific.storage import detect_alliance_hub_blue, detect_alliance_hub_red, \
     detect_shared_hub
 from ftcscore.processing.background_selection import McKennaBackgroundSubtractor
 from ftcscore.processing.crop import crop_info_panel, crop_to_rect
+from ftcscore.processing.normalize import normalize_standard, normalize_comprehensive
 from ftcscore.processing.perspective_transform import get_four_point_transform
 from ftcscore.tracking.mckenna import TrackerMcKenna
 from ftcscore.util.fps import get_fps, show_fps
@@ -13,11 +16,12 @@ video_source = cv2.VideoCapture('../data/processed/videos/new/match-oregon.mp4-2
 
 width = int(video_source.get(cv2.CAP_PROP_FRAME_WIDTH))
 height = int(video_source.get(cv2.CAP_PROP_FRAME_HEIGHT))
+video_fps = int(video_source.get(cv2.CAP_PROP_FPS))
 
 frame_num = 0
 prev_frame_time = 0
 
-bg_subtractor = McKennaBackgroundSubtractor()
+# tracker = TrackerMcKenna(bg_subtractor=cv2.createBackgroundSubtractorMOG2())
 
 # Wait for field detection
 while True:
@@ -46,18 +50,30 @@ while True:
     if not got_frame:
         break
 
+    if frame_num < video_fps * 45:
+        frame_num += 1
+        continue
+
     cropped = crop_info_panel(frame)
     overhead = transform(cropped)
     overhead = crop_to_rect(overhead, rect)
 
-    bg = bg_subtractor.apply(overhead)
-    cv2.imshow('win', bg)
+    # blue_hub = detect_alliance_hub_blue(overhead)
+    # red_hub = detect_alliance_hub_red(overhead)
+    #
+    # for hub in (blue_hub, red_hub, shared_hub):
+    #     cv2.rectangle(overhead, hub, color=(0, 255, 0), thickness=2)
+
+    shared_hub = detect_shared_hub(overhead)
+    only_shared = crop_to_rect(overhead, shared_hub)
+    img, boxes = detect_all_elements(only_shared)
+    print(len(boxes))
 
     fps, prev_frame_time = get_fps(prev_frame_time)
-    show_fps(cropped, fps)
+    show_fps(overhead, fps)
 
-    cv2.imshow("video", cropped)
     cv2.imshow("overhead", overhead)
+    cv2.imshow('img', img)
 
     key = cv2.waitKey(30)
     if key == ord('q'):

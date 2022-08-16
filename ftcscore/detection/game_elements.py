@@ -1,11 +1,11 @@
-from typing import Iterable, Tuple
-from ftcscore.detection.game_specific.game_elements import GameElement, BGRImage, detectors
 import itertools
-import numpy as np
+from typing import Tuple, List
 import cv2
+import numpy as np
+from ftcscore.detection.game_specific.game_elements import GameElement, BGRImage, detectors
 
 
-def detect_all_elements(overhead: BGRImage) -> Tuple[BGRImage, Iterable[GameElement]]:
+def detect_all_elements(overhead: BGRImage) -> Tuple[BGRImage, List[GameElement]]:
     all_elements = (detector(overhead) for detector in detectors)
     all_elements = itertools.chain.from_iterable(all_elements)
     all_elements = list(all_elements)

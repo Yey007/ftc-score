@@ -12,3 +12,8 @@ def point_in_rect(rect, point):
 def rects_overlap(rect1, rect2):
     points = rect_to_points(rect2)
     return any(point_in_rect(rect1, p) for p in points)
+
+
+def enlarge_rect(rect, pixels):
+    x, y, w, h = rect
+    return x - pixels, y - pixels, w + 2 * pixels, h + 2 * pixels

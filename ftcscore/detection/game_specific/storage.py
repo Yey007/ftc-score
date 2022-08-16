@@ -3,6 +3,7 @@ import numpy as np
 
 from ftcscore.processing.normalize import normalize_lcn, normalize_comprehensive, normalize_standard
 from ftcscore.util.contours import contour_y, contour_x, contour_aspect_ratio
+from ftcscore.util.rect import enlarge_rect
 
 open_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (16, 16))
 
@@ -21,10 +22,8 @@ def detect_alliance_hub_blue(frame):
     if tracker_blue is not None:
         (success, box) = tracker_blue.update(frame)
         if success:
-            (x, y, w, h) = [int(v) for v in box]
-            cv2.rectangle(frame, (x, y), (x + w, y + h),
-                          (0, 255, 0), 2)
-            return
+            rect = [int(v) for v in box]
+            return enlarge_rect(rect, 5)
 
     norm = normalize_lcn(frame)
     mask = cv2.inRange(norm, (40, 0, 0), (130, 40, 40))
@@ -48,6 +47,7 @@ def detect_alliance_hub_blue(frame):
     rect = cv2.boundingRect(both)
     tracker_blue = cv2.legacy.TrackerKCF_create()
     tracker_blue.init(frame, rect)
+    return enlarge_rect(rect, 5)
 
 
 def detect_alliance_hub_red(frame):
@@ -57,10 +57,8 @@ def detect_alliance_hub_red(frame):
     if tracker_red is not None:
         (success, box) = tracker_red.update(frame)
         if success:
-            (x, y, w, h) = [int(v) for v in box]
-            cv2.rectangle(frame, (x, y), (x + w, y + h),
-                          (0, 255, 0), 2)
-            return
+            rect = [int(v) for v in box]
+            return enlarge_rect(rect, 5)
 
     norm = normalize_lcn(frame)
     mask = cv2.inRange(norm, (0, 0, 40), (20, 20, 110))
@@ -84,6 +82,7 @@ def detect_alliance_hub_red(frame):
     rect = cv2.boundingRect(both)
     tracker_red = cv2.legacy.TrackerKCF_create()
     tracker_red.init(frame, rect)
+    return enlarge_rect(rect, 5)
 
 
 def detect_shared_hub(frame):
@@ -93,10 +92,8 @@ def detect_shared_hub(frame):
     if tracker_shared is not None:
         (success, box) = tracker_shared.update(frame)
         if success:
-            (x, y, w, h) = [int(v) for v in box]
-            cv2.rectangle(frame, (x, y), (x + w, y + h),
-                          (0, 255, 0), 2)
-            return
+            rect = [int(v) for v in box]
+            return enlarge_rect(rect, 5)
 
     mask = cv2.inRange(frame, (0,) * 3, (80,) * 3)
 
@@ -115,6 +112,7 @@ def detect_shared_hub(frame):
     bottom_contour = max(contours, key=cv2.contourArea)
 
     x, y, w, h = cv2.boundingRect(bottom_contour)
-    rect = (x, y, w, h - 25)
-    tracker_shared = cv2.legacy.TrackerKCF_create()
+    rect = (x, y, w, h - 20)
+    tracker_shared = cv2.TrackerMIL_create()
     tracker_shared.init(frame, rect)
+    return enlarge_rect(rect, 5)

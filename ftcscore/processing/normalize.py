@@ -13,7 +13,7 @@ def normalize_comprehensive(frame):
     previous = frame
     delta = 1
 
-    while delta > 0.001:
+    while delta > 0.00001:
         sums = np.sum(frame, axis=2, keepdims=True)
         sums[sums == 0] = 1
         frame = frame / sums
