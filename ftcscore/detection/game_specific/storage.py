@@ -103,7 +103,7 @@ def detect_shared_hub(frame):
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (8, 8))
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
 
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (18, 18))
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (12, 12))
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
 
     contours, _ = cv2.findContours(mask, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_SIMPLE)
@@ -113,6 +113,22 @@ def detect_shared_hub(frame):
 
     x, y, w, h = cv2.boundingRect(bottom_contour)
     rect = (x, y, w, h - 20)
-    tracker_shared = cv2.TrackerMIL_create()
+    tracker_shared = cv2.legacy.TrackerKCF_create()
     tracker_shared.init(frame, rect)
     return enlarge_rect(rect, 5)
+
+
+def detect_shared_hub_circles(overhead):
+    grey = cv2.cvtColor(overhead, cv2.COLOR_BGR2GRAY)
+    grey = cv2.GaussianBlur(grey, (5, 5), 1)
+
+    circles = cv2.HoughCircles(grey, cv2.HOUGH_GRADIENT, 1, 20,
+                               param1=90, param2=60, minRadius=10, maxRadius=50)
+
+    if circles is None:
+        return None
+
+    # Bottom half and middle third
+    circles = filter(lambda c: , circles)
+
+    return

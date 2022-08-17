@@ -8,7 +8,7 @@ from scipy.signal import convolve
 # From paper: Comprehensive Colour Image Normalization
 def normalize_comprehensive(frame):
     num_pixels = frame.shape[0] * frame.shape[1]
-    frame = frame.astype('float32') / 255
+    frame = frame.astype(np.float32) / 255
 
     previous = frame
     delta = 1
@@ -34,13 +34,13 @@ def normalize_pixels(frame):
     sums[sums == 0] = 1
     frame = frame / sums
     frame *= 255
-    return frame.astype('uint8')
+    return frame.astype(np.uint8)
 
 
 # From paper: Adaptive Local Contrast Normalization
 def normalize_standard(frame):
-    std = (frame - np.mean(frame)) / np.std(frame)
-    return cv2.normalize(std, 0, 255, norm_type=cv2.NORM_MINMAX).astype('uint8')
+    std = (frame - np.mean(frame, axis=(0, 1))) / np.std(frame, axis=(0, 1))
+    return cv2.normalize(std, 0, 255, norm_type=cv2.NORM_MINMAX).astype(np.uint8)
 
 
 # From paper: Adaptive Local Contrast Normalization
