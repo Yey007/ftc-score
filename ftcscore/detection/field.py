@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 
-from ftcscore.processing.normalize import normalize_comprehensive
-from ftcscore.util.lines import intersection, lines_to_distances
+from ftcscore.processing.normalize import normalize_comprehensive, normalize_standard
+from ftcscore.util.lines import intersection, lines_to_lengths, lines_to_slopes
 
 lsd = cv2.createLineSegmentDetector(scale=0.1)
 
@@ -29,13 +29,14 @@ def detect_field_from_edges(frame):
     def detect_edges(inp):
         lines = lsd.detect(inp)[0]
 
-        distances = lines_to_distances(lines)
-        lines = lines[distances > 300]
+        lengths = lines_to_lengths(lines)
+        slopes = lines_to_slopes(lines)
+        filtered = lines[(lengths > 300) & (np.abs(slopes) < 7)]
 
-        upper_line = min(lines, key=lambda l: l[0][1] + l[0][3])
-        lower_line = max(lines, key=lambda l: l[0][1] + l[0][3])
-        left_line = min(lines, key=lambda l: l[0][0] + l[0][2])
-        right_line = max(lines, key=lambda l: l[0][0] + l[0][2])
+        upper_line = min(filtered, key=lambda l: l[0][1] + l[0][3])
+        lower_line = max(filtered, key=lambda l: l[0][1] + l[0][3])
+        left_line = min(filtered, key=lambda l: l[0][0] + l[0][2])
+        right_line = max(filtered, key=lambda l: l[0][0] + l[0][2])
 
         important_lines = np.array([upper_line, lower_line, left_line, right_line])
 
@@ -80,12 +81,12 @@ def detect_field_from_edges(frame):
 def detect_field_from_color(frame):
     frame = normalize_comprehensive(frame)
     mask = cv2.inRange(frame, (78, 85, 70), (95, 95, 88))
-    
+
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (30, 30))
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
 
     contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    contours = tuple(filter(lambda c: cv2.contourArea(c) > 2000, contours))
+    contours = tuple(filter(lambda c: cv2.contourArea(c) > 4000, contours))
 
     mask_color = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
     cv2.drawContours(mask_color, contours, -1, (0, 255, 0), thickness=3)

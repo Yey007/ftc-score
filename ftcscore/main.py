@@ -1,13 +1,11 @@
 import cv2
 
 from ftcscore.detection.field import detect_field_from_edges, detect_field_from_color
-from ftcscore.detection.game_specific.storage import detect_shared_hub
 from ftcscore.processing.crop import crop_info_panel, crop_to_rect
-from ftcscore.processing.normalize import normalize_standard, normalize_comprehensive
 from ftcscore.processing.perspective_transform import get_four_point_transform
 from ftcscore.util.fps import get_fps, show_fps
 
-video_source = cv2.VideoCapture('../data/processed/videos/new/match-wisconsin.mp4-216195-220965.mp4')
+video_source = cv2.VideoCapture('../data/processed/videos/new/match-oregon.mp4-87611-92351.mp4')
 
 width = int(video_source.get(cv2.CAP_PROP_FRAME_WIDTH))
 height = int(video_source.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -46,11 +44,6 @@ while True:
     cropped = crop_info_panel(frame)
     overhead = transform(cropped)
     overhead = crop_to_rect(overhead, rect)
-
-    overhead = normalize_standard(overhead)
-    shared = detect_shared_hub(overhead)
-    if shared is not None:
-        cv2.circle(overhead, (shared[0], shared[1]), shared[2], color=(0, 255, 0), thickness=2)
 
     # blue_hub = detect_alliance_hub_blue(overhead)
     # red_hub = detect_alliance_hub_red(overhead)

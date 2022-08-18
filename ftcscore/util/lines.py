@@ -1,7 +1,13 @@
 import numpy as np
 
 
-def lines_to_distances(lines):
+def lines_to_slopes(lines):
+    delta_y = lines[:, 0, 1] - lines[:, 0, 3]
+    delta_x = lines[:, 0, 0] - lines[:, 0, 2]
+    return delta_y / delta_x
+
+
+def lines_to_lengths(lines):
     return np.sqrt(
         np.square(lines[:, 0, 0] - lines[:, 0, 2]) + np.square(lines[:, 0, 1] - lines[:, 0, 3])
     )
@@ -18,5 +24,5 @@ def intersection(l1, l2):
     l2 = np.cross(h[2], h[3])  # get second line
     x, y, z = np.cross(l1, l2)  # point of intersection
     if z == 0:  # lines are parallel
-        raise Exception('Parallel lines do not intersect')
+        raise Exception('Parallel lines do not intersect. Did you pass the same line?')
     return int(x / z), int(y / z)
