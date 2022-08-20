@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 from ftcscore.processing.normalize import normalize_comprehensive, normalize_standard
-from ftcscore.util.lines import intersection, lines_to_lengths, lines_to_slopes
+from ftcscore.util.lines import intersection, lines_to_lengths, lines_to_slopes, merge_lines
 
 lsd = cv2.createLineSegmentDetector(scale=0.1)
 

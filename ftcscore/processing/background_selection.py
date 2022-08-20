@@ -25,7 +25,7 @@ class McKennaBackgroundSubtractor(cv2.BackgroundSubtractor):
             self.prev_pixel_mean = image
             self.prev_pixel_var = np.zeros(image.shape)
             self.prev_cam_mean = np.mean(image, axis=(0, 1))
-            self.prev_cam_var = np.array(image.shape[2])
+            self.prev_cam_var = np.zeros(image.shape[2])
 
         pixel_mean = alpha * self.prev_pixel_mean + (1 - alpha) * image
         pixel_var = alpha * (self.prev_pixel_var + (pixel_mean - self.prev_pixel_mean) ** 2) \

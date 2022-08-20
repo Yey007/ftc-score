@@ -1,8 +1,7 @@
-import itertools
 from collections import defaultdict
 from dataclasses import dataclass
 from enum import auto, Enum
-from typing import Tuple, List
+from typing import List
 import cv2
 import numpy as np
 import numpy.typing as npt

@@ -1,18 +1,25 @@
 import cv2
 
 from ftcscore.detection.field import detect_field_from_edges, detect_field_from_color
+from ftcscore.detection.game_specific.storage import detect_shared_hub
+from ftcscore.processing.background_selection import McKennaBackgroundSubtractor
 from ftcscore.processing.crop import crop_info_panel, crop_to_rect
+from ftcscore.processing.normalize import normalize_standard
 from ftcscore.processing.perspective_transform import get_four_point_transform
+from ftcscore.tracking.detector_tracker import DetectorTracker
+from ftcscore.tracking.improved_camshift import TrackerImprovedCamshift
+from ftcscore.tracking.template import TrackerTemplate
 from ftcscore.util.fps import get_fps, show_fps
+from ftcscore.util.rect import enlarge_rect
 
-video_source = cv2.VideoCapture('../data/processed/videos/new/match-oregon.mp4-87611-92351.mp4')
+video_source = cv2.VideoCapture('../data/processed/videos/new/match-oregon.mp4-252003-256743.mp4')
 
 width = int(video_source.get(cv2.CAP_PROP_FRAME_WIDTH))
 height = int(video_source.get(cv2.CAP_PROP_FRAME_HEIGHT))
 video_fps = int(video_source.get(cv2.CAP_PROP_FPS))
 
-frame_num = 0
 prev_frame_time = 0
+shared_tracker = DetectorTracker(detect_shared_hub, cv2.legacy.TrackerCSRT_create, track_frequency=3)
 
 # Wait for field detection
 while True:
@@ -45,16 +52,10 @@ while True:
     overhead = transform(cropped)
     overhead = crop_to_rect(overhead, rect)
 
-    # blue_hub = detect_alliance_hub_blue(overhead)
-    # red_hub = detect_alliance_hub_red(overhead)
-    #
-    # for hub in (blue_hub, red_hub, shared_hub):
-    #     cv2.rectangle(overhead, hub, color=(0, 255, 0), thickness=2)
-
-    # shared_hub = detect_shared_hub(overhead)
-    # only_shared = crop_to_rect(overhead, shared_hub)
-    # img, boxes = detect_all_elements(only_shared)
-    # print(len(boxes))
+    r = shared_tracker.update(overhead)
+    if r is not None:
+        r = enlarge_rect(r, 10)
+        cv2.rectangle(overhead, r, color=(0, 255, 0), thickness=2)
 
     fps, prev_frame_time = get_fps(prev_frame_time)
     show_fps(overhead, fps)
@@ -68,8 +69,6 @@ while True:
         key = cv2.waitKey(0)
         if key == ord('q'):
             break
-
-    frame_num += 1
 
 cv2.destroyAllWindows()
 video_source.release()

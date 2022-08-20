@@ -31,9 +31,6 @@ def best_defects(defects, contour):
     start = None
     end = None
 
-    med_defect_dist = np.median(defects, axis=(0, 1))[3]
-    defect_dist_thresh = med_defect_dist - 100
-
     for i in range(defects.shape[0]):
         for j in range(i + 1, defects.shape[0]):
             p1_dist = defects[i, 0, 3]
