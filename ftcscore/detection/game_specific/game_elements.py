@@ -71,27 +71,11 @@ def split_cluster(cluster):
     return [*new_1_split, *new_2_split]
 
 
-knn = cv2.ml.KNearest_create()
-colors = np.array(
-    [[160, 90, 70], [120, 100, 220], [160, 160, 160], [0, 0, 0], [255, 255, 255], [140, 200, 250],
-     [100, 160, 212]]).astype(np.float32)
-labels = np.arange(0, colors.shape[0])
-knn.train(colors, cv2.ml.ROW_SAMPLE, labels)
-
-# h: 10-30
-# s: 70-160
-# v: 160-255
 def detect_cubes(region: BGRImage) -> Iterable[GameElement]:
-    res = region.reshape((-1, 3)).astype(np.float32)
-    ret, result, neighbours, dist = knn.findNearest(res, k=1)
-    result = result.astype(np.uint8)
-    res = np.choose(result, colors)
-    res = res.reshape(region.shape).astype(np.uint8)
+    hsv = cv2.cvtColor(region, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(hsv, (10, 50, 160), (30, 160, 255))
 
-    mask = cv2.inRange(res, (140, 200, 250), (140, 200, 250))
-    mask = cv2.bitwise_or(mask, cv2.inRange(res, (100, 160, 212), (100, 160, 212)))
-
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (4, 4))
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (4, 4))
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=1)
 
     contours, _ = cv2.findContours(mask, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_NONE)

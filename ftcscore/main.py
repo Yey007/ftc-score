@@ -58,7 +58,7 @@ while True:
 
         norm = normalize_standard(overhead)
         cropped = crop_to_rect(norm, r)
-        _, elements = detect_all_elements(norm)
+        _, elements = detect_all_elements(cropped)
         for element in elements:
             x, y = element.position
             x, y = x + r[0], y + r[1]
