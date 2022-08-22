@@ -14,7 +14,8 @@ def detect_field_from_edges(frame):
     def preprocess(inp):
         mask = cv2.GaussianBlur(inp, (5, 5), 1)
 
-        mask = cv2.inRange(mask, (0,) * 3, (80,) * 3)
+        mask = cv2.inRange(mask, (0, 0, 0), (80, 80, 80))
+
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
 

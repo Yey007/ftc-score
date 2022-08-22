@@ -1,14 +1,13 @@
 import cv2
 
 from ftcscore.detection.field import detect_field_from_edges, detect_field_from_color
+from ftcscore.detection.game_elements import detect_all_elements
 from ftcscore.detection.game_specific.storage import detect_shared_hub
 from ftcscore.processing.background_selection import McKennaBackgroundSubtractor
 from ftcscore.processing.crop import crop_info_panel, crop_to_rect
 from ftcscore.processing.normalize import normalize_standard
 from ftcscore.processing.perspective_transform import get_four_point_transform
 from ftcscore.tracking.detector_tracker import DetectorTracker
-from ftcscore.tracking.improved_camshift import TrackerImprovedCamshift
-from ftcscore.tracking.template import TrackerTemplate
 from ftcscore.util.fps import get_fps, show_fps
 from ftcscore.util.rect import enlarge_rect
 
@@ -56,6 +55,15 @@ while True:
     if r is not None:
         r = enlarge_rect(r, 10)
         cv2.rectangle(overhead, r, color=(0, 255, 0), thickness=2)
+
+        norm = normalize_standard(overhead)
+        cropped = crop_to_rect(norm, r)
+        _, elements = detect_all_elements(norm)
+        for element in elements:
+            x, y = element.position
+            x, y = x + r[0], y + r[1]
+            w, h = element.size
+            cv2.rectangle(overhead, (x, y), (x + w, y + h), color=(0, 0, 255), thickness=1)
 
     fps, prev_frame_time = get_fps(prev_frame_time)
     show_fps(overhead, fps)

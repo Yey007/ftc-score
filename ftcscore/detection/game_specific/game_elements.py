@@ -42,7 +42,7 @@ def best_defects(defects, contour):
             p2 = tuple(contour[p2i][0])
             dist_squared = (p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2
             if min_dist > dist_squared and \
-                    p1_dist > 175 and p2_dist > 175:
+                    p1_dist > 150 and p2_dist > 150:
                 start = p2i
                 end = p1i
                 min_dist = dist_squared
@@ -78,14 +78,15 @@ colors = np.array(
 labels = np.arange(0, colors.shape[0])
 knn.train(colors, cv2.ml.ROW_SAMPLE, labels)
 
-
-def detect_cubes(overhead: BGRImage) -> Iterable[GameElement]:
-    norm = normalize_standard(overhead)
-    res = norm.reshape((-1, 3)).astype(np.float32)
+# h: 10-30
+# s: 70-160
+# v: 160-255
+def detect_cubes(region: BGRImage) -> Iterable[GameElement]:
+    res = region.reshape((-1, 3)).astype(np.float32)
     ret, result, neighbours, dist = knn.findNearest(res, k=1)
     result = result.astype(np.uint8)
     res = np.choose(result, colors)
-    res = res.reshape(norm.shape).astype(np.uint8)
+    res = res.reshape(region.shape).astype(np.uint8)
 
     mask = cv2.inRange(res, (140, 200, 250), (140, 200, 250))
     mask = cv2.bitwise_or(mask, cv2.inRange(res, (100, 160, 212), (100, 160, 212)))
@@ -95,8 +96,8 @@ def detect_cubes(overhead: BGRImage) -> Iterable[GameElement]:
 
     contours, _ = cv2.findContours(mask, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_NONE)
 
-    clusters = filter(lambda c: cv2.contourArea(c) >= 180, contours)
-    individuals = list(filter(lambda c: 180 > cv2.contourArea(c) > 20, contours))
+    clusters = list(filter(lambda c: cv2.contourArea(c) >= 120, contours))
+    individuals = list(filter(lambda c: 120 > cv2.contourArea(c) > 20, contours))
 
     for cluster in clusters:
         split = split_cluster(cluster)
@@ -107,45 +108,6 @@ def detect_cubes(overhead: BGRImage) -> Iterable[GameElement]:
 
     return [GameElement(type=GameElementType.CUBE, position=np.array((x, y)), size=np.array((w, h))) for x, y, w, h in
             boxes]
-
-
-# def detect_cubes(overhead: BGRImage) -> Iterable[GameElement]:
-#     norm = normalize_standard(overhead)
-#     hsv = cv2.cvtColor(norm, cv2.COLOR_BGR2HSV)
-#     cv2.imshow('bruh', hsv)
-#     mask = cv2.inRange(hsv, (0, 30, 10), (30, 190, 255))
-#     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (4, 4))
-#     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=1)
-#
-#     result = cv2.bitwise_and(norm, norm, mask=mask)
-#     cv2.imshow('cubes', result)
-#     return []
-
-# def detect_cubes(storage: BGRImage):
-#     norm = normalize_lcn(storage)
-#     norm = cv2.normalize(norm, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX)
-#     cv2.imshow('norm', norm)
-#     mask = cv2.inRange(norm, (0, 0, 20), (35, 60, 130))
-#
-#     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
-#     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=1)
-#     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-#     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=2)
-#
-#     contours, _ = cv2.findContours(mask, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_SIMPLE)
-#     clusters = filter(lambda c: cv2.contourArea(c) >= 200, contours)
-#     individuals = filter(lambda c: 200 > cv2.contourArea(c) > 80, contours)
-#
-#     for cluster in clusters:
-#         rect = cv2.boundingRect(cluster)
-#         cv2.rectangle(storage, rect, color=(255, 0, 0))
-#
-#     for individual in individuals:
-#         rect = cv2.boundingRect(individual)
-#         cv2.rectangle(storage, rect, color=(0, 255, 0))
-#
-#     cv2.imshow('mask', mask)
-#     return []
 
 
 detectors = [detect_cubes]
