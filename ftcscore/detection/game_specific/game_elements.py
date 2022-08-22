@@ -80,14 +80,14 @@ def detect_cubes(region: BGRImage) -> Iterable[GameElement]:
 
     contours, _ = cv2.findContours(mask, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_NONE)
 
-    clusters = list(filter(lambda c: cv2.contourArea(c) >= 120, contours))
-    individuals = list(filter(lambda c: 120 > cv2.contourArea(c) > 20, contours))
+    clusters = list(filter(lambda c: cv2.contourArea(c) >= 130, contours))
+    individuals = list(filter(lambda c: 130 > cv2.contourArea(c) > 40, contours))
 
     for cluster in clusters:
         split = split_cluster(cluster)
         individuals.extend(split)
 
-    individuals = filter(lambda c: cv2.contourArea(c) > 20, individuals)
+    individuals = filter(lambda c: cv2.contourArea(c) > 40, individuals)
     boxes = map(cv2.boundingRect, individuals)
 
     return [GameElement(type=GameElementType.CUBE, position=np.array((x, y)), size=np.array((w, h))) for x, y, w, h in
