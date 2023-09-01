@@ -1,6 +1,6 @@
 # ftc-score
 ftc-score is the product of a [research paper](https://github.com/Yey007/ftc-score/blob/main/paper/paper.pdf) I wrote on scoring FIRST Tech Challenge games using computer vision.
-I used live streams from the 2021-2022 Freight Frenzy season. The code was written with extensibility in mind, but is still tailored to Freight Frenzy.
+I used live streams from the 2021-2022 Freight Frenzy season. The code was written with extensibility in mind, but is still tailored to Freight Frenzy. As of now, the program can't give you a score, but it's decent at isolating important objects like the field and game elements.
 
 If you want to know about the strengths and weaknesses of the program, check out the analysis section of the paper. 
 
